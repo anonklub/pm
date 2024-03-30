@@ -27,6 +27,31 @@ To develop a mechanism allowing users to anonymously prove ownership of Ethereum
 2. **Off-Chain Verification**: The single verifier entity checks the proofs off-chain, verifying their validity based on the provided data and the uniqueness of the nullifier.
 
 3. **On-Chain Storage**: Upon successful verification, the nullifier and an IPFS link to the detailed proof data are recorded in a smart contract on the Ethereum blockchain. This process ensures that each proof can be independently verified and is not reused, while also making the verification process transparent.
+  Example:
+    ```solidity
+    // SPDX-License-Identifier: MIT
+    pragma solidity ^0.8.0;
+    
+    contract ProofRegistry {
+        // Mapping from nullifier to IPFS hash
+        mapping(bytes32 => string) public nullifierToIPFSHash;
+    
+        event ProofAdded(bytes32 indexed nullifier, string ipfsHash);
+    
+        function addProof(bytes32 nullifier, string memory ipfsHash) public {
+            require(bytes(nullifierToIPFSHash[nullifier]).length == 0, "Nullifier already used");
+    
+            nullifierToIPFSHash[nullifier] = ipfsHash;
+    
+            emit ProofAdded(nullifier, ipfsHash);
+        }
+    
+        function getProofIPFSHash(bytes32 nullifier) public view returns (string memory) {
+            return nullifierToIPFSHash[nullifier];
+        }
+    }
+    
+    ```
 
 ## Trust Considerations
 
